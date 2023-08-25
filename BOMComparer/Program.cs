@@ -5,8 +5,10 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
+using System;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 List<string> data = new();
 string path = @"C:\Users\iot3\source\repos\Zaidimelis\bin\Debug\net7.0\BOM_B.xlsx";
@@ -18,7 +20,7 @@ int colCount;
 
 
 BomFile bomFile = new();
-string filePath = @"C:\Users\iot3\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_B.xlsx";
+string filePath = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_B.xlsx";
 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 {
     IWorkbook workbook = new XSSFWorkbook(fs); // For XLSX files
@@ -51,7 +53,7 @@ using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
     }
 }
 BomFile bomFile2 = new();
-string filePath2 = @"C:\Users\iot3\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_A.xls";
+string filePath2 = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_A.xls";
 using (FileStream fs = new FileStream(filePath2, FileMode.Open, FileAccess.Read))
 {
     //IWorkbook workbook = new XSSFWorkbook(fs); // For XLSX files
@@ -364,12 +366,13 @@ using (var excelPackage = new XSSFWorkbook())
     blah(worksheet);
 
     IRichTextString richText = new XSSFRichTextString("Hello, world!");
-
+    
     // Apply formatting to the first part
     IFont font1 = excelPackage.CreateFont();
     font1.Color = HSSFColor.Red.Index; // Set the font color to red
     IRichTextString part1 = new XSSFRichTextString("Hello, ");
     part1.ApplyFont(0, part1.Length, font1);
+    
 
 
     worksheet.SetAutoFilter(new CellRangeAddress(0, 0, 0, 2));
@@ -409,7 +412,7 @@ using (var excelPackage = new XSSFWorkbook())
         Console.WriteLine(columnWidth);
         worksheet.SetColumnWidth(col, columnWidth + columnWidth / 10);
     }
-
+    string oe = "";
     for (int i = 0; i < 13; i++)
     {
         
@@ -417,16 +420,49 @@ using (var excelPackage = new XSSFWorkbook())
         {   
             if (comparedBomFile.ComparedBomFileRows[i].Result == ResultsType.Added)
             {
-               if(worksheet.GetRow(i)?.GetCell(c).CellStyle != null)
+               if(worksheet.GetRow(i)?.GetCell(c) != null)
                 {
                     worksheet.GetRow(i).GetCell(c).CellStyle = styleGreen;
                 } 
             }
             else if(comparedBomFile.ComparedBomFileRows[i].Result == ResultsType.Modified)
             {
-                if (worksheet.GetRow(i)?.GetCell(c).CellStyle != null && comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(worksheet.GetRow(i)?.GetCell(c).ToString()))
+                if (worksheet.GetRow(i)?.GetCell(c) != null )
                 {
-                    worksheet.GetRow(i).GetCell(c).CellStyle = styleModified;
+                    
+                    if(c==2)
+                    {
+                        var arr = worksheet.GetRow(i)?.GetCell(c).ToString().Split(',').Select(s => s.Trim()).ToList();
+                        
+                        var richText5 = new XSSFRichTextString();
+                        foreach (var item in arr)
+                        {
+                            var font6 = new XSSFFont();
+                            font6.Color = HSSFColor.Green.Index;
+                            if()
+                            richText5.Append(", ");
+                            if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(item))
+                            {
+                                richText5.Append(item, (XSSFFont)font6);
+                            }
+                            else
+                            {
+                                richText5.Append(item);
+                            }
+                            
+                            
+                        }
+                        Console.WriteLine(richText5);
+                        
+                        worksheet.GetRow(i).GetCell(c).SetCellValue(richText5);
+                        
+
+
+                    }
+                    else if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(worksheet.GetRow(i)?.GetCell(c).ToString()))
+                    {
+                        worksheet.GetRow(i).GetCell(c).CellStyle = styleModified;
+                    }
                 }
             }
 
