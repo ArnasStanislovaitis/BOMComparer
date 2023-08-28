@@ -20,7 +20,8 @@ int colCount;
 
 
 BomFile bomFile = new();
-string filePath = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_B.xlsx";
+BomFile bomFile2 = new();
+string filePath = @"C:\Users\iot3\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_B.xlsx";
 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 {
     IWorkbook workbook = new XSSFWorkbook(fs); // For XLSX files
@@ -34,7 +35,7 @@ using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
     {
         IRow row = sheet.GetRow(rowIndex);
         var dictionaryKey = row.GetCell(1).StringCellValue;
-        bomFile.BomFileRoww[dictionaryKey] = new BomFileRow
+        bomFile2.BomFileRoww[dictionaryKey] = new BomFileRow
         {
             Quantity = row.GetCell(0).ToString(),
             PartNumber = row.GetCell(1).StringCellValue,
@@ -52,8 +53,8 @@ using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 
     }
 }
-BomFile bomFile2 = new();
-string filePath2 = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_A.xls";
+
+string filePath2 = @"C:\Users\iot3\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_A.xls";
 using (FileStream fs = new FileStream(filePath2, FileMode.Open, FileAccess.Read))
 {
     //IWorkbook workbook = new XSSFWorkbook(fs); // For XLSX files
@@ -66,7 +67,7 @@ using (FileStream fs = new FileStream(filePath2, FileMode.Open, FileAccess.Read)
     {
         IRow row = sheet.GetRow(rowIndex);
         var dictionaryKey = row.GetCell(1).StringCellValue;
-        bomFile2.BomFileRoww[dictionaryKey] = new BomFileRow
+        bomFile.BomFileRoww[dictionaryKey] = new BomFileRow
         {
             Quantity = row.GetCell(0).ToString(),
             PartNumber = row.GetCell(1).StringCellValue,
@@ -146,10 +147,7 @@ foreach (var item in comparedBomFile.ComparedBomFileRows)
 (ComparedBomFileRow, ComparedBomFileRow) ModifiedRowComparer2(BomFileRow sourceFileRow, BomFileRow targetFileRow)
 {
     var comparedSourceFileRow = MapToComparedRow(sourceFileRow, ResultsType.Modified);
-    var comparedTargetFileRow = MapToComparedRow(targetFileRow , ResultsType.Modified);
-    Guid guid = Guid.NewGuid();
-    
-    Console.WriteLine(guid);
+    var comparedTargetFileRow = MapToComparedRow(targetFileRow , ResultsType.Modified);    
 
     var propertiesToCompare = typeof(BomFileRow).GetProperties();
 
@@ -157,11 +155,9 @@ foreach (var item in comparedBomFile.ComparedBomFileRows)
     {
         if (property.PropertyType == typeof(List<string>))
         {
-            var comparedDesignators = DesignatorDifferences(sourceFileRow.Designator, targetFileRow.Designator);
-            property.SetValue(comparedSourceFileRow, comparedDesignators.Item1);
-            property.SetValue(comparedTargetFileRow, comparedDesignators.Item2);
-            comparedSourceFileRow.ChangedValues.AddRange(comparedDesignators.Item3);
-            comparedTargetFileRow.ChangedValues.AddRange(comparedDesignators.Item4);
+            var designatorDifferences = DesignatorDifferences(sourceFileRow.Designator, targetFileRow.Designator);            
+            comparedSourceFileRow.ChangedValues.AddRange(designatorDifferences.Item1);
+            comparedTargetFileRow.ChangedValues.AddRange(designatorDifferences.Item2);
             continue;
         }
         var sourceValue = property.GetValue(sourceFileRow)?.ToString();
@@ -237,7 +233,7 @@ foreach (var item in comparedBomFile.ComparedBomFileRows)
 }
 
 
-(List<string>, List<string>,List<string>,List<string>) DesignatorDifferences(List<string> source, List<string> target)
+(List<string>, List<string>,List<string>,List<string>) DesignatorDifferences2(List<string> source, List<string> target)
 {
     var removedValues = source.Except(target).ToList();    //removed
     var addedValues = target.Except(source).ToList();      //added   
@@ -261,6 +257,14 @@ foreach (var item in comparedBomFile.ComparedBomFileRows)
     target.Sort();
 
     return (source, target,removedValues,addedValues);
+}
+
+(List<string>, List<string>) DesignatorDifferences(List<string> source, List<string> target)
+{
+    var removedValues = source.Except(target).ToList();
+    var addedValues = target.Except(source).ToList();    
+
+    return (removedValues, addedValues);
 }
 
 ComparedBomFileRow MapToComparedRow(BomFileRow source, ResultsType resultType)
@@ -363,16 +367,9 @@ using (var excelPackage = new XSSFWorkbook())
     // Add a new worksheet
     ISheet worksheet = excelPackage.CreateSheet("Sheet1");
 
-    blah(worksheet);
+    //blah(worksheet);
 
-    IRichTextString richText = new XSSFRichTextString("Hello, world!");
-    
-    // Apply formatting to the first part
-    IFont font1 = excelPackage.CreateFont();
-    font1.Color = HSSFColor.Red.Index; // Set the font color to red
-    IRichTextString part1 = new XSSFRichTextString("Hello, ");
-    part1.ApplyFont(0, part1.Length, font1);
-    
+        
 
 
     worksheet.SetAutoFilter(new CellRangeAddress(0, 0, 0, 2));
@@ -382,14 +379,10 @@ using (var excelPackage = new XSSFWorkbook())
     style.FillPattern = FillPattern.SolidForeground;
     style.Alignment = HorizontalAlignment.Center;
     style.VerticalAlignment = VerticalAlignment.Center;
+
+
     // Green
-    ICellStyle styleGreen = excelPackage.CreateCellStyle();
-
-    
-    
-    
-    
-
+    ICellStyle styleGreen = excelPackage.CreateCellStyle(); 
     IFont font = excelPackage.CreateFont();
     font.Boldweight = (short)FontBoldWeight.Bold;
     style.SetFont(font);
@@ -403,6 +396,13 @@ using (var excelPackage = new XSSFWorkbook())
     font3.Color = HSSFColor.Orange.Index; // Set the font color to red
     styleModified.SetFont(font3);
 
+    //removed
+    ICellStyle styleRemoved = excelPackage.CreateCellStyle();
+    IFont fontRemoved = excelPackage.CreateFont();
+    fontRemoved.IsStrikeout = true;
+    fontRemoved.Color = HSSFColor.Red.Index; // Set the font color to red
+    styleRemoved.SetFont(fontRemoved);
+    /*
     for (int col = 0; col < 10; col++) // Assuming 10 columns
     {
         worksheet.GetRow(0).GetCell(col).CellStyle = style;
@@ -411,36 +411,93 @@ using (var excelPackage = new XSSFWorkbook())
         int columnWidth = worksheet.GetColumnWidth(col);
         Console.WriteLine(columnWidth);
         worksheet.SetColumnWidth(col, columnWidth + columnWidth / 10);
-    }
-    string oe = "";
+    }*/
+    /*
     for (int i = 0; i < 13; i++)
     {
         
         for (int c = 0; c < 10; c++)
         {   
             if (comparedBomFile.ComparedBomFileRows[i].Result == ResultsType.Added)
-            {
-               if(worksheet.GetRow(i)?.GetCell(c) != null)
-                {
-                    worksheet.GetRow(i).GetCell(c).CellStyle = styleGreen;
-                } 
+            {               
+                worksheet.GetRow(i).GetCell(c).CellStyle = styleGreen;                
             }
             else if(comparedBomFile.ComparedBomFileRows[i].Result == ResultsType.Modified)
-            {
-                if (worksheet.GetRow(i)?.GetCell(c) != null )
-                {
+            {                
                     
-                    if(c==2)
-                    {
-                        var arr = worksheet.GetRow(i)?.GetCell(c).ToString().Split(',').Select(s => s.Trim()).ToList();
+                if(c == 2)
+                {                    
                         
+                    var richText5 = new XSSFRichTextString();
+                    foreach (var item in comparedBomFile.ComparedBomFileRows[i].Designator)
+                    {
+                        var font6 = new XSSFFont();
+                        font6.Color = HSSFColor.Green.Index;
+
+
+                        if (comparedBomFile.ComparedBomFileRows[i].Designator.IndexOf(item) > 0)
+                        {
+                            richText5.Append(", ");
+                        }
+                        if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(item))
+                        {
+                            richText5.Append(item, (XSSFFont)font6);
+                        }
+                        else
+                        {
+                            richText5.Append(item);
+                        }                      
+
+                        
+                    }
+                    Console.WriteLine(richText5);
+                    worksheet.GetRow(i).GetCell(c).SetCellValue(richText5);
+
+                }
+                else if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(worksheet.GetRow(i)?.GetCell(c).ToString()!))
+                {
+                    worksheet.GetRow(i).GetCell(c).CellStyle = styleModified;
+                }
+                
+            }
+
+        }
+    }
+    */
+    for (int i = 0; i < 13; i++)
+    {
+        for (int c = 0; c < 10; c++)
+        {
+            switch (comparedBomFile.ComparedBomFileRows[i].Result)
+            {
+                case ResultsType.Added:
+                    worksheet.GetRow(i).GetCell(c).CellStyle = styleGreen;
+                    break;
+                case ResultsType.Removed:
+                    worksheet.GetRow(i).GetCell(c).CellStyle = styleRemoved;
+                    break;
+                case ResultsType.Modified:
+                    if (c == 2)
+                    {
                         var richText5 = new XSSFRichTextString();
-                        foreach (var item in arr)
+                        foreach (var item in comparedBomFile.ComparedBomFileRows[i].Designator)
                         {
                             var font6 = new XSSFFont();
-                            font6.Color = HSSFColor.Green.Index;
-                            if()
-                            richText5.Append(", ");
+                            if(i + 1 < 13 && comparedBomFile.ComparedBomFileRows[i].PartNumber == comparedBomFile.ComparedBomFileRows[i + 1].PartNumber)
+                            {
+                                font6.Color = HSSFColor.Red.Index;
+                                font6.IsStrikeout = true;
+                            }
+                            else
+                            {
+                                font6.Color = HSSFColor.Green.Index;
+                            }
+                            
+
+                            if (comparedBomFile.ComparedBomFileRows[i].Designator.IndexOf(item) > 0)
+                            {
+                                richText5.Append(", ");
+                            }
                             if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(item))
                             {
                                 richText5.Append(item, (XSSFFont)font6);
@@ -449,25 +506,27 @@ using (var excelPackage = new XSSFWorkbook())
                             {
                                 richText5.Append(item);
                             }
-                            
-                            
                         }
                         Console.WriteLine(richText5);
-                        
                         worksheet.GetRow(i).GetCell(c).SetCellValue(richText5);
-                        
-
-
                     }
-                    else if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(worksheet.GetRow(i)?.GetCell(c).ToString()))
+                    else if (comparedBomFile.ComparedBomFileRows[i].ChangedValues.Contains(worksheet.GetRow(i)?.GetCell(c).ToString()!))
                     {
                         worksheet.GetRow(i).GetCell(c).CellStyle = styleModified;
+                        if (i + 1 < 13 && comparedBomFile.ComparedBomFileRows[i].PartNumber == comparedBomFile.ComparedBomFileRows[i + 1].PartNumber)
+                        {
+                            worksheet.GetRow(i).GetCell(c).CellStyle = styleRemoved;
+                        }
+                        else
+                        {
+                            worksheet.GetRow(i).GetCell(c).CellStyle = styleGreen;
+                        }
                     }
-                }
+                    break;
             }
-
         }
     }
+
 
 
 
