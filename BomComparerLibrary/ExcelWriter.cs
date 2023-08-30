@@ -8,7 +8,7 @@ namespace BOMComparer
     public class ExcelWriter
     {
         readonly Styles styles = new();
-        public void WriteExcelFile(ComparedBomFile comparedBomFile)
+        public byte[] WriteExcelFile(ComparedBomFile comparedBomFile)
         {            
             using (var excelPackage = new XSSFWorkbook())
             {
@@ -25,7 +25,12 @@ namespace BOMComparer
                 using (var fs = new FileStream("output.xlsx", FileMode.Create))
                 {
                     excelPackage.Write(fs);                    
-                }                
+                }
+                using (var memoryStream = new MemoryStream())
+                {
+                    excelPackage.Write(memoryStream, true);
+                    return memoryStream.ToArray();
+                }
             }
         }
         void SetValues(int row, ComparedBomFile bomFile, IRow excelRow)
