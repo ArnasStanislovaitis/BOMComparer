@@ -11,4 +11,8 @@
     <PackageReference Include="NPOI" Version="2.6.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BomComparerLibrary\BomComparerLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

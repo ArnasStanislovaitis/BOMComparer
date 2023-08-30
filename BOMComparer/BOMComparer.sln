@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BOMComparer", "BOMComparer.csproj", "{44104867-AD46-4262-8A86-5E2F1FEDF60C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BOMComparer", "BOMComparer.csproj", "{44104867-AD46-4262-8A86-5E2F1FEDF60C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BomComparerLibrary", "..\BomComparerLibrary\BomComparerLibrary.csproj", "{BBC0DA38-3EFA-4C6A-850A-E189136CAB4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComparerAPI", "..\ComparerAPI\ComparerAPI.csproj", "{0A21AC90-343A-4BB9-BA2A-4A30CF2DCC30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{44104867-AD46-4262-8A86-5E2F1FEDF60C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44104867-AD46-4262-8A86-5E2F1FEDF60C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44104867-AD46-4262-8A86-5E2F1FEDF60C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBC0DA38-3EFA-4C6A-850A-E189136CAB4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBC0DA38-3EFA-4C6A-850A-E189136CAB4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBC0DA38-3EFA-4C6A-850A-E189136CAB4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBC0DA38-3EFA-4C6A-850A-E189136CAB4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A21AC90-343A-4BB9-BA2A-4A30CF2DCC30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A21AC90-343A-4BB9-BA2A-4A30CF2DCC30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A21AC90-343A-4BB9-BA2A-4A30CF2DCC30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A21AC90-343A-4BB9-BA2A-4A30CF2DCC30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
