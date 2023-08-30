@@ -1,32 +1,32 @@
-﻿using BOMComparer;
-using BOMComparer.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Utilities;
-using System.IO;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ComparerAPI.Controllers
+namespace ComparerAPI
 {
-
-
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class BomController : ControllerBase
-    {      
+    {
+        private readonly IBomFileService _bomFileService;
 
-        [HttpPost("ReadBomFile")]
-        public ActionResult<BomFile> ReadBomFile( string filePath, string filePath2)
+        public BomController(IBomFileService bomFileService)
         {
-            ExcelReader excelReader = new();
-            BomFile bomFile = excelReader.ReadBomFile(filePath);
-            BomFile bomFile2 = excelReader.ReadBomFile(filePath2);
-            Comparer comparer = new();
-            var comparedBom = comparer.ComparedBomFile(bomFile, bomFile2);
-            ExcelWriter excelWriter = new();
-            var b = excelWriter.WriteExcelFile(comparedBom); 
-            
-            return File( b, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  "report.xlsx");            
+            _bomFileService = bomFileService;
+        }
 
+        [HttpPost("ReadAndCompare")]
+        public ActionResult CompareBomFiles(string sourcePath, string targetPath)
+        {
+            try
+            {
+                var comparedBomFile = _bomFileService.CompareBomFiles(sourcePath, targetPath);
+                var excelBytes = _bomFileService.WriteComparedBomToExcel(comparedBomFile);
+
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "report.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
