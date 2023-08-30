@@ -27,5 +27,4 @@ namespace ComparerAPI
             return _excelWriter.WriteExcelFile(comparedBomFile);
         }
     }
-
 }

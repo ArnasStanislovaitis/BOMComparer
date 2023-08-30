@@ -61,10 +61,12 @@ namespace BOMComparer
                     var cellDesignator = excelRow.CreateCell(column);
                     var designator = styles.GetStyledDesignator(bomFile, rowIndex);
                     cellDesignator.SetCellValue(designator);
+
+                    continue;
                 }
                 else
                 {
-                    var cellStyle = styles.GetCellStyle(bomFile, worksheet, rowIndex, column, excelPackage, cell);
+                    var cellStyle = styles.GetCellStyle(bomFile, worksheet, rowIndex, excelPackage, cell);
                     cell.CellStyle = cellStyle;
                 }
             }

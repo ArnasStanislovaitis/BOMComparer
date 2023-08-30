@@ -8,24 +8,23 @@ namespace BOMComparer
     public class ExcelReader
     {
         public BomFile ReadBomFile(string filePath)
-        {
-            BomFile bomFile = new();
-            IWorkbook workbook;
-        
+        {                 
             using (FileStream fs = new(filePath, FileMode.Open, FileAccess.Read))
             {  
-                var fileName = Path.GetFileName(filePath);
-                bomFile.Name = fileName;
-                var extension = Path.GetExtension(fileName);
 
-                if(extension == ".xlsx")
+                var fileName = Path.GetFileName(filePath);
+                BomFile bomFile = new(){
+                    Name = fileName,                    
+                };                
+                
+                var extension = Path.GetExtension(fileName);
+                IWorkbook workbook = extension switch
                 {
-                    workbook = new XSSFWorkbook(fs);
-                }
-                else
-                {
-                    workbook = new HSSFWorkbook(fs);
-                }
+                    ".xlsx" => new XSSFWorkbook(fs),
+                    ".xls" => new HSSFWorkbook(fs),
+                    _ => throw new NotImplementedException()
+                }; 
+
                 var sheet = workbook.GetSheetAt(0);
                 
                 for (int rowIndex = 0; rowIndex <= sheet.LastRowNum; rowIndex++)

@@ -1,7 +1,7 @@
 ﻿using BOMComparer;
 
-string filePath = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_B.xlsx";
-string filePath2 = @"C:\Users\Arnas\Documents\GitHub\BOMComparer\BOMComparer\bin\Debug\net6.0\BOM_A.xls";
+string filePath2 = @"C:\Users\Arnas\Desktop\04_2023-08-09\BOM_B.xlsx";
+string filePath = @"C:\Users\Arnas\Desktop\04_2023-08-09\BOM_A.xls";
 
 ExcelReader exr = new();
 ExcelReader exrr = new();

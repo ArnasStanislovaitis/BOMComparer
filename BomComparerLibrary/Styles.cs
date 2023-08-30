@@ -7,7 +7,7 @@ namespace BOMComparer
 {
     public class Styles
     {
-        public ICellStyle GetCellStyle(ComparedBomFile bomFile, ISheet worksheet, int row, int column, XSSFWorkbook excelPackage, ICell cell)
+        public ICellStyle GetCellStyle(ComparedBomFile bomFile, ISheet worksheet, int row, XSSFWorkbook excelPackage, ICell cell)
         {
             switch (bomFile.ComparedBomFileRows[row].Result)
             {
@@ -21,7 +21,7 @@ namespace BOMComparer
 
                 case ResultsType.Modified:
 
-                    return ModifiedCellStyle(row, worksheet, bomFile, cell, excelPackage);
+                    return ModifiedCellStyle(row, bomFile, cell, excelPackage);
 
                 default:
                     ICellStyle defaultStyle = worksheet.Workbook.CreateCellStyle();
@@ -29,7 +29,7 @@ namespace BOMComparer
                     return defaultStyle;
             }
         }
-        private ICellStyle ModifiedCellStyle(int row, ISheet workbook, ComparedBomFile bomFile, ICell cell, XSSFWorkbook excelPackage)
+        private ICellStyle ModifiedCellStyle(int row, ComparedBomFile bomFile, ICell cell, XSSFWorkbook excelPackage)
         {
             if (bomFile.ComparedBomFileRows[row].ChangedValues.Contains(cell.ToString()!))
             {
@@ -47,25 +47,37 @@ namespace BOMComparer
             return default!;
 
         }
+
+        XSSFFont SetDesignatorFont(ComparedBomFile bomFile, int row)
+        {
+            if (row + 1 < bomFile.ComparedBomFileRows.Count && bomFile.ComparedBomFileRows[row].PartNumber == bomFile.ComparedBomFileRows[row + 1].PartNumber
+                    || bomFile.ComparedBomFileRows[row].Result == ResultsType.Removed)
+            {
+                var font1 = new XSSFFont
+                {
+                    Color = HSSFColor.Red.Index,
+                    IsStrikeout = true
+                };
+
+                return font1;
+            }
+            else
+            {
+                var font2 = new XSSFFont
+                {
+                    Color = HSSFColor.Green.Index
+                };
+
+                return font2;
+            }
+        }
         public XSSFRichTextString GetStyledDesignator(ComparedBomFile bomFile, int row)
         {
             var richText = new XSSFRichTextString();
-            var font = new XSSFFont();
+            var font = SetDesignatorFont(bomFile, row);
 
             foreach (var item in bomFile.ComparedBomFileRows[row].Designator)
-            {
-
-                if (row + 1 < bomFile.ComparedBomFileRows.Count && bomFile.ComparedBomFileRows[row].PartNumber == bomFile.ComparedBomFileRows[row + 1].PartNumber
-                    || bomFile.ComparedBomFileRows[row].Result == ResultsType.Removed)
-                {
-                    font.Color = HSSFColor.Red.Index;
-                    font.IsStrikeout = true;
-                }
-                else
-                {
-                    font.Color = HSSFColor.Green.Index;
-                }
-
+            {                             
 
                 if (bomFile.ComparedBomFileRows[row].Designator.IndexOf(item) > 0)
                 {
@@ -76,12 +88,13 @@ namespace BOMComparer
                     || bomFile.ComparedBomFileRows[row].Result == ResultsType.Removed
                     || bomFile.ComparedBomFileRows[row].Result == ResultsType.Added)
                 {
-                    richText.Append(item, font);
-                }
+                    richText.Append(item,font);
+                }                
                 else
                 {
                     richText.Append(item);
                 }
+                
             }
 
             return richText;
@@ -98,9 +111,7 @@ namespace BOMComparer
         }
         private ICellStyle StyleAdded(XSSFWorkbook excelPackage)
         {
-            var styleAdded = excelPackage.CreateCellStyle();
-            var font = excelPackage.CreateFont();
-            font.IsBold = true;
+            var styleAdded = excelPackage.CreateCellStyle();  
             var font2 = excelPackage.CreateFont();
             font2.Color = HSSFColor.Green.Index;
             styleAdded.SetFont(font2);

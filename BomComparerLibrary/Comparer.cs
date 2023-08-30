@@ -4,14 +4,21 @@ namespace BOMComparer
 {
     public class Comparer
     {
-        readonly ComparedBomFile comparedBomFile = new();
-        readonly Mapper mapper = new();
-        public ComparedBomFile ComparedBomFile(BomFile source, BomFile target)
+        private readonly ComparedBomFile _comparedBomFile;
+        private readonly Mapper _mapper;
+
+        public Comparer()
         {
+            _comparedBomFile = new ComparedBomFile(); ;
+            _mapper = new Mapper();
+        }
+
+        public ComparedBomFile ComparedBomFile(BomFile source, BomFile target)
+        {            
             CompareValues(source, target);
             AddedValues(source, target);
 
-            return comparedBomFile;
+            return _comparedBomFile;
         }
         private void CompareValues(BomFile source, BomFile target)
         {     
@@ -21,19 +28,19 @@ namespace BOMComparer
 
                 if (target.BomFileRow.ContainsKey(lineKey) && EqualRows(source.BomFileRow[lineKey], target.BomFileRow[lineKey]))
                 {
-                    var comparedRow = mapper.MapToComparedRow(source.BomFileRow[lineKey], ResultsType.Unchanged,target.Name);
-                    comparedBomFile.ComparedBomFileRows.Add(comparedRow);
+                    var comparedRow = _mapper.MapToComparedRow(source.BomFileRow[lineKey], ResultsType.Unchanged,target.Name);
+                    _comparedBomFile.ComparedBomFileRows.Add(comparedRow);
                 }
                 else if (target.BomFileRow.ContainsKey(lineKey) && !EqualRows(source.BomFileRow[lineKey], target.BomFileRow[lineKey]))
                 {
                     var bim = ModifiedRowComparer(source.BomFileRow[lineKey], target.BomFileRow[lineKey], source.Name,target.Name);
-                    comparedBomFile.ComparedBomFileRows.Add(bim.Item1);
-                    comparedBomFile.ComparedBomFileRows.Add(bim.Item2);                    
+                    _comparedBomFile.ComparedBomFileRows.Add(bim.Item1);
+                    _comparedBomFile.ComparedBomFileRows.Add(bim.Item2);                    
                 }
                 else if (!target.BomFileRow.ContainsKey(lineKey))
                 {
-                    var comparedRow = mapper.MapToComparedRow(source.BomFileRow[lineKey], ResultsType.Removed, source.Name);
-                    comparedBomFile.ComparedBomFileRows.Add(comparedRow);                    
+                    var comparedRow = _mapper.MapToComparedRow(source.BomFileRow[lineKey], ResultsType.Removed, source.Name);
+                    _comparedBomFile.ComparedBomFileRows.Add(comparedRow);                    
                 }
 
             }
@@ -44,16 +51,16 @@ namespace BOMComparer
             {
                 if (!source.BomFileRow.ContainsKey(lineKey))
                 {
-                    var comparedRow = mapper.MapToComparedRow(target.BomFileRow[lineKey], ResultsType.Added, target.Name);
-                    comparedBomFile.ComparedBomFileRows.Add(comparedRow);                    
+                    var comparedRow = _mapper.MapToComparedRow(target.BomFileRow[lineKey], ResultsType.Added, target.Name);
+                    _comparedBomFile.ComparedBomFileRows.Add(comparedRow);                    
                 }
             }
         }
 
         private (ComparedBomFileRow, ComparedBomFileRow) ModifiedRowComparer(BomFileRow sourceFileRow, BomFileRow targetFileRow, string sourceName, string targetName)
         {
-            var comparedSourceFileRow = mapper.MapToComparedRow(sourceFileRow, ResultsType.Modified, sourceName);
-            var comparedTargetFileRow = mapper.MapToComparedRow(targetFileRow, ResultsType.Modified, targetName);
+            var comparedSourceFileRow = _mapper.MapToComparedRow(sourceFileRow, ResultsType.Modified, sourceName);
+            var comparedTargetFileRow = _mapper.MapToComparedRow(targetFileRow, ResultsType.Modified, targetName);
 
             var propertiesToCompare = typeof(BomFileRow).GetProperties();
 
